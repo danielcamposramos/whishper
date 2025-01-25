@@ -1,5 +1,6 @@
 @echo off
 rem Script by @johnwayne087, see: https://github.com/pluja/whishper/issues/18#issuecomment-1724095055
+rem Revised by @danielcamposramos see: https://github.com/danielcamposramos/whishper
 
 rem Check if Docker is installed
 docker --version >nul 2>&1
@@ -23,7 +24,7 @@ if /i "%answer%"=="Y" (
 
 rem Get docker-compose.yml
 echo Getting the docker-compose.yml file from Github
-curl -o docker-compose.yml https://raw.githubusercontent.com/pluja/whishper/main/docker-compose.yml
+curl -o docker-compose.yml https://github.com/danielcamposramos/whishper/raw/refs/heads/main/docker-compose.yml
 
 rem Get .env file
 if exist .env (
@@ -32,13 +33,13 @@ if exist .env (
   set /p answer=
   if /i "%answer%"=="Y" (
     echo Overwriting .env file
-    curl -o .env https://raw.githubusercontent.com/pluja/whishper/main/example.env
+    curl -o .env https://github.com/danielcamposramos/whishper/raw/refs/heads/main/example.env
   ) else (
     echo Keeping the existing .env file
   )
 ) else (
   echo Getting the default .env file from Github
-  curl -o .env https://raw.githubusercontent.com/pluja/whishper/main/example.env
+  curl -o .env https://github.com/danielcamposramos/whishper/raw/refs/heads/main/example.env
 )
 
 rem Create directories
