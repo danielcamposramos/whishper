@@ -7,9 +7,9 @@ RUN wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /us
 RUN chmod a+rx /usr/local/bin/yt-dlp
 
 # Backend setup
-FROM devopsworks/golang-upx:latest as backend-builder
+FROM devopsworks/golang-upx:1.23 AS backend-builder
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 COPY ./backend /app
 RUN go mod tidy
@@ -18,7 +18,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o whishper . && \
 RUN chmod a+rx whishper
 
 # Frontend setup
-FROM node:alpine as frontend
+FROM node:alpine AS frontend
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -34,21 +34,40 @@ ENV BODY_SIZE_LIMIT=0
 RUN pnpm run build
 
 # Base container
-FROM python:3.11-slim as base
+FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04 AS base
+
+ENV PYTHON_VERSION=3.12
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -qq update \
     && apt-get -qq install --no-install-recommends \
-    ffmpeg curl nodejs nginx supervisor \
+    python${PYTHON_VERSION} \
+    python${PYTHON_VERSION}-venv \
+    python3-pip \
+    ffmpeg \
+    curl wget xz-utils \
+    ffmpeg nginx supervisor \
     && rm -rf /var/lib/apt/lists/*
+
+RUN ln -s -f /usr/bin/python${PYTHON_VERSION} /usr/bin/python3 && \
+    ln -s -f /usr/bin/python${PYTHON_VERSION} /usr/bin/python && \
+    ln -s -f /usr/bin/pip3 /usr/bin/pip && \
+    python${PYTHON_VERSION} -m venv ~/.venv
 
 # Python service setup
 COPY ./transcription-api /app/transcription
 WORKDIR /app/transcription
-RUN pip3 install -r requirements.txt
-RUN pip3 install python-multipart
-
+RUN ~/.venv/bin/pip install -r requirements.txt && \
+    ~/.venv/bin/pip install python-multipart && \
+    ~/.venv/bin/pip3 install torch --index-url https://download.pytorch.org/whl/cu118
+ 
 # Node.js service setup
+RUN wget https://nodejs.org/dist/v20.9.0/node-v20.9.0-linux-x64.tar.xz && \
+    tar -xf node-v20.9.0-linux-x64.tar.xz && \
+    mv node-v20.9.0-linux-x64 /usr/local/lib/node && \
+    rm node-v20.9.0-linux-x64.tar.xz
+ENV PATH="/usr/local/lib/node/bin:${PATH}"
+
 ENV BODY_SIZE_LIMIT=0
 COPY ./frontend /app/frontend
 COPY --from=frontend-build /app/build /app/frontend
