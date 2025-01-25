@@ -61,13 +61,13 @@ fi
 echo ""
 echo -e "ℹ️  Getting the docker-compose.yml file from Github"
 if [ "$gpu" = true ] ;then
-    curl -o docker-compose.yml https://raw.githubusercontent.com/pluja/whishper/main/docker-compose.gpu.yml > /dev/null 2>&1
+    curl -o docker-compose.yml https://github.com/danielcamposramos/whishper/raw/refs/heads/main/docker-compose.gpu.yml > /dev/null 2>&1
 else
-    curl -o docker-compose.yml https://raw.githubusercontent.com/pluja/whishper/main/docker-compose.yml > /dev/null 2>&1
+    curl -o docker-compose.yml https://github.com/danielcamposramos/whishper/raw/refs/heads/main/docker-compose.yml > /dev/null 2>&1
 fi
 sleep 1
 
-# check if .env exists
+ check if .env exists
 if [ -f .env ]; then
     echo ""
     echo -e "${YELLOW}⚠️  .env file already exists${NC}"
@@ -76,13 +76,13 @@ if [ -f .env ]; then
     if [ "$answer" != "${answer#[Yy]}" ] ;then
         echo -e "ℹ️  Copying env.example to .env"
         cp .env .env.backup
-        curl -o .env https://raw.githubusercontent.com/pluja/whishper/main/example.env > /dev/null 2>&1
+        curl -o .env https://github.com/danielcamposramos/whishper/raw/refs/heads/main/example.env > /dev/null 2>&1
         sleep 1
     fi
     echo ""
 else
     echo -e "ℹ️  Getting the default .env file from Github"
-    curl -o .env https://raw.githubusercontent.com/pluja/whishper/main/example.env > /dev/null 2>&1
+    curl -o .env https://github.com/danielcamposramos/whishper/raw/refs/heads/main/example.env > /dev/null 2>&1
     sleep 1
 fi
 
