@@ -1,7 +1,7 @@
 <script>
 	import { Toaster } from 'svelte-french-toast';
 	import { transcriptions, uploadProgress } from '$lib/stores';
-	import { browser, dev } from '$app/environment';
+	import { browser } from '$app/environment';
 	import { CLIENT_WS_HOST } from '$lib/utils';
 	import { onMount, onDestroy } from 'svelte';
 	import ModalTranscriptionForm from '$lib/components/ModalTranscriptionForm.svelte';
@@ -14,6 +14,8 @@
 
 	//export let data;
 	let socket;
+	let modalDownloadOptions;
+	let modalTranslation;
 	export let data;
 
 	function connect() {
@@ -45,20 +47,20 @@
 		};
 
 		socket.onmessage = (event) => {
-            let update = JSON.parse(event.data);
-            // use update to update the store
-            transcriptions.update(transcriptions => {
-                let index = transcriptions.findIndex(tr => tr.id === update.id);
-                if (index >= 0) {
-                    // replace the item at index
-                    transcriptions[index] = update;
-                } else {
-                    // add the new item
-                    transcriptions.push(update);
-                }
-                return transcriptions; // return a new object to trigger reactivity
-            });
-        };
+			let update = JSON.parse(event.data);
+			// use update to update the store
+			transcriptions.update((transcriptions) => {
+				let index = transcriptions.findIndex((tr) => tr.id === update.id);
+				if (index >= 0) {
+					// replace the item at index
+					transcriptions[index] = update;
+				} else {
+					// add the new item
+					transcriptions.push(update);
+				}
+				return transcriptions; // return a new object to trigger reactivity
+			});
+		};
 	}
 
 	onMount(() => {
@@ -84,8 +86,8 @@
 </script>
 
 <Toaster />
-<ModalDownloadOptions tr={downloadTranscription} />
-<ModalTranslationForm tr={translateTranscription} />
+<ModalDownloadOptions bind:this={modalDownloadOptions} tr={downloadTranscription} />
+<ModalTranslationForm bind:this={modalTranslation} tr={translateTranscription} />
 <ModalTranscriptionForm />
 
 <header>
@@ -101,7 +103,7 @@
 <main class="w-4/6 mx-auto mt-4 mb-8 card bg-neutral text-neutral-content">
 	{#if $uploadProgress > 0}
 		<div class="flex flex-col items-center justify-center px-4 pt-4 my-4">
-			<progress class="w-full mx-2 progress progress-success" value="{$uploadProgress}" max="100"></progress>
+			<progress class="w-full mx-2 progress progress-success" value={$uploadProgress} max="100" />
 			<span>Uploading...</span>
 		</div>
 	{:else}

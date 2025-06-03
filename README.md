@@ -35,7 +35,7 @@
 - [ ] User authentication.
 - [ ] Audio recording from the browser.
 - [ ] Add [insanely-fast-whisper](https://github.com/Vaibhavs10/insanely-fast-whisper) as an optional backend ([#53](https://github.com/pluja/whishper/issues/53)).
-- [x] ~~Support for GPU acceleration.~~
+- [x] Support for GPU acceleration.
   - [ ] Non NVIDIA GPU support. Is it possible with faster-whisper?
 - [ ] Can we do something with [seamless_communication](https://github.com/facebookresearch/seamless_communication)?
 
