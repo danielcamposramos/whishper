@@ -85,7 +85,7 @@
 			formData.append('file', fileInput.files[0]);
 		}
 
-		return new Promise((resolve, reject) => {
+		await new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 
 			// Set up progress event listener
@@ -123,8 +123,6 @@
 		sourceUrl = '';
 		fileInput.value = '';
 		uploadProgress.set(0);
-
-		toast.success('Success!');
 	}
 
 	// Reactive statement
